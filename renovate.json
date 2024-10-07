@@ -1,0 +1,19 @@
+{
+  "baseBranches": ["main", "rhoai-2.13"],
+  "enabledManagers": ["dockerfile", "tekton"],
+  "dockerfile": {
+    "enabled": true,
+    "ignoreTests": true,
+    "automergeType": "pr",
+    "automerge": true
+  },
+  "tekton": {
+    "enabled": true,
+    "fileMatch": [
+      "^\\.tekton/.*\\.yaml$"
+    ],
+    "ignoreTests": true,
+    "automergeType": "pr",
+    "automerge": false
+  }
+}
