@@ -1,4 +1,4 @@
-FROM registry.fedoraproject.org/fedora-toolbox:42
+FROM registry.fedoraproject.org/fedora-toolbox:38
 
 ARG GOLANG_VERSION=1.21
 ARG OPERATOR_SDK_VERSION=1.31.0
