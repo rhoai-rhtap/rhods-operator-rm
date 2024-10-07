@@ -48,17 +48,18 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
+	ctrlmetrics "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	ctrlwebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	kfdefv1 "github.com/opendatahub-io/opendatahub-operator/apis/kfdef.apps.kubeflow.org/v1"
 	dscv1 "github.com/opendatahub-io/opendatahub-operator/v2/apis/datasciencecluster/v1"
 	dsciv1 "github.com/opendatahub-io/opendatahub-operator/v2/apis/dscinitialization/v1"
 	featurev1 "github.com/opendatahub-io/opendatahub-operator/v2/apis/features/v1"
 	"github.com/opendatahub-io/opendatahub-operator/v2/controllers/certconfigmapgenerator"
-	datascienceclustercontrollers "github.com/opendatahub-io/opendatahub-operator/v2/controllers/datasciencecluster"
-	dscicontr "github.com/opendatahub-io/opendatahub-operator/v2/controllers/dscinitialization"
+	dscctrl "github.com/opendatahub-io/opendatahub-operator/v2/controllers/datasciencecluster"
+	dscictrl "github.com/opendatahub-io/opendatahub-operator/v2/controllers/dscinitialization"
 	"github.com/opendatahub-io/opendatahub-operator/v2/controllers/secretgenerator"
 	"github.com/opendatahub-io/opendatahub-operator/v2/pkg/cluster"
-	"github.com/opendatahub-io/opendatahub-operator/v2/pkg/common"
+	"github.com/opendatahub-io/opendatahub-operator/v2/pkg/logger"
 	"github.com/opendatahub-io/opendatahub-operator/v2/pkg/upgrade"
 )
 
@@ -70,7 +71,7 @@ var (
 )
 
 func init() { //nolint:gochecknoinits
-	//+kubebuilder:scaffold:scheme
+	// +kubebuilder:scaffold:scheme
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(dsciv1.AddToScheme(scheme))
 	utilruntime.Must(dscv1.AddToScheme(scheme))
@@ -79,14 +80,12 @@ func init() { //nolint:gochecknoinits
 	utilruntime.Must(addonv1alpha1.AddToScheme(scheme))
 	utilruntime.Must(rbacv1.AddToScheme(scheme))
 	utilruntime.Must(corev1.AddToScheme(scheme))
-	utilruntime.Must(apiextensionsv1.AddToScheme(scheme))
 	utilruntime.Must(routev1.Install(scheme))
 	utilruntime.Must(appsv1.AddToScheme(scheme))
 	utilruntime.Must(oauthv1.Install(scheme))
 	utilruntime.Must(ofapiv1alpha1.AddToScheme(scheme))
 	utilruntime.Must(userv1.Install(scheme))
 	utilruntime.Must(ofapiv2.AddToScheme(scheme))
-	utilruntime.Must(kfdefv1.AddToScheme(scheme))
 	utilruntime.Must(ocappsv1.Install(scheme))
 	utilruntime.Must(buildv1.Install(scheme))
 	utilruntime.Must(imagev1.Install(scheme))
@@ -120,12 +119,18 @@ func main() {
 
 	flag.Parse()
 
-	ctrl.SetLogger(common.ConfigLoggers(logmode))
+	ctrl.SetLogger(logger.ConfigLoggers(logmode))
 
-	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:                 scheme,
-		MetricsBindAddress:     metricsAddr,
-		Port:                   9443,
+	// root context
+	ctx := ctrl.SetupSignalHandler()
+
+	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{ // single pod does not need to have LeaderElection
+		Scheme:  scheme,
+		Metrics: ctrlmetrics.Options{BindAddress: metricsAddr},
+		WebhookServer: ctrlwebhook.NewServer(ctrlwebhook.Options{
+			Port: 9443,
+			// TLSOpts: , // TODO: do we need tls for webhook
+		}),
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "07ed84f7.opendatahub.io",
@@ -146,28 +151,28 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&dscicontr.DSCInitializationReconciler{
+	if err = (&dscictrl.DSCInitializationReconciler{
 		Client:                mgr.GetClient(),
 		Scheme:                mgr.GetScheme(),
-		Log:                   ctrl.Log.WithName(operatorName).WithName("controllers").WithName("DSCInitialization"),
+		Log:                   logger.LogWithLevel(ctrl.Log.WithName(operatorName).WithName("controllers").WithName("DSCInitialization"), logmode),
 		Recorder:              mgr.GetEventRecorderFor("dscinitialization-controller"),
 		ApplicationsNamespace: dscApplicationsNamespace,
-	}).SetupWithManager(mgr); err != nil {
+	}).SetupWithManager(ctx, mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "DSCInitiatlization")
 		os.Exit(1)
 	}
 
-	if err = (&datascienceclustercontrollers.DataScienceClusterReconciler{
+	if err = (&dscctrl.DataScienceClusterReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-		Log:    ctrl.Log.WithName(operatorName).WithName("controllers").WithName("DataScienceCluster"),
-		DataScienceCluster: &datascienceclustercontrollers.DataScienceClusterConfig{
+		Log:    logger.LogWithLevel(ctrl.Log.WithName(operatorName).WithName("controllers").WithName("DataScienceCluster"), logmode),
+		DataScienceCluster: &dscctrl.DataScienceClusterConfig{
 			DSCISpec: &dsciv1.DSCInitializationSpec{
 				ApplicationsNamespace: dscApplicationsNamespace,
 			},
 		},
 		Recorder: mgr.GetEventRecorderFor("datasciencecluster-controller"),
-	}).SetupWithManager(mgr); err != nil {
+	}).SetupWithManager(ctx, mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "DataScienceCluster")
 		os.Exit(1)
 	}
@@ -175,7 +180,7 @@ func main() {
 	if err = (&secretgenerator.SecretGeneratorReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-		Log:    ctrl.Log.WithName(operatorName).WithName("controllers").WithName("SecretGenerator"),
+		Log:    logger.LogWithLevel(ctrl.Log.WithName(operatorName).WithName("controllers").WithName("SecretGenerator"), logmode),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "SecretGenerator")
 		os.Exit(1)
@@ -184,7 +189,7 @@ func main() {
 	if err = (&certconfigmapgenerator.CertConfigmapGeneratorReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-		Log:    ctrl.Log.WithName(operatorName).WithName("controllers").WithName("CertConfigmapGenerator"),
+		Log:    logger.LogWithLevel(ctrl.Log.WithName(operatorName).WithName("controllers").WithName("CertConfigmapGenerator"), logmode),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "CertConfigmapGenerator")
 		os.Exit(1)
@@ -206,7 +211,7 @@ func main() {
 		os.Exit(1)
 	}
 	// Get operator platform
-	platform, err := cluster.GetPlatform(setupClient)
+	platform, err := cluster.GetPlatform(ctx, setupClient)
 	if err != nil {
 		setupLog.Error(err, "error getting platform")
 		os.Exit(1)
@@ -230,16 +235,10 @@ func main() {
 		}
 	}
 
-	// Remove TrustyAI for RHOAI
-	// TODO: Remove below check when trustyai manifests are removed in midstream
-	if err = upgrade.RemoveDeprecatedTrustyAI(setupClient, platform); err != nil {
-		setupLog.Error(err, "unable to remove trustyai from DSC")
-	}
-
 	// Create default DSC CR for managed RHODS
 	if platform == cluster.ManagedRhods {
 		var createDefaultDSCFunc manager.RunnableFunc = func(ctx context.Context) error {
-			err := upgrade.CreateDefaultDSC(context.TODO(), setupClient)
+			err := upgrade.CreateDefaultDSC(ctx, setupClient)
 			if err != nil {
 				setupLog.Error(err, "unable to create default DSC CR by the operator")
 			}
@@ -274,7 +273,7 @@ func main() {
 	}
 
 	setupLog.Info("starting manager")
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+	if err := mgr.Start(ctx); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}

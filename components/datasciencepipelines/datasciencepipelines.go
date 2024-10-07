@@ -41,11 +41,11 @@ type DataSciencePipelines struct {
 	components.Component `json:""`
 }
 
-func (d *DataSciencePipelines) OverrideManifests(_ string) error {
+func (d *DataSciencePipelines) OverrideManifests(ctx context.Context, _ cluster.Platform) error {
 	// If devflags are set, update default manifests path
 	if len(d.DevFlags.Manifests) != 0 {
 		manifestConfig := d.DevFlags.Manifests[0]
-		if err := deploy.DownloadManifests(ComponentName, manifestConfig); err != nil {
+		if err := deploy.DownloadManifests(ctx, ComponentName, manifestConfig); err != nil {
 			return err
 		}
 		// If overlay is defined, update paths
@@ -97,14 +97,14 @@ func (d *DataSciencePipelines) ReconcileComponent(ctx context.Context,
 	if enabled {
 		if d.DevFlags != nil {
 			// Download manifests and update paths
-			if err := d.OverrideManifests(string(platform)); err != nil {
+			if err := d.OverrideManifests(ctx, platform); err != nil {
 				return err
 			}
 		}
 		// skip check if the dependent operator has beeninstalled, this is done in dashboard
 		// Update image parameters only when we do not have customized manifests set
 		if (dscispec.DevFlags == nil || dscispec.DevFlags.ManifestsUri == "") && (d.DevFlags == nil || len(d.DevFlags.Manifests) == 0) {
-			if err := deploy.ApplyParams(Path, imageParamMap, false); err != nil {
+			if err := deploy.ApplyParams(Path, imageParamMap); err != nil {
 				return fmt.Errorf("failed to update image from %s : %w", Path, err)
 			}
 		}
@@ -119,26 +119,24 @@ func (d *DataSciencePipelines) ReconcileComponent(ctx context.Context,
 	if platform == cluster.OpenDataHub || platform == "" {
 		manifestsPath = filepath.Join(OverlayPath, "odh")
 	}
-	if err := deploy.DeployManifestsFromPath(cli, owner, manifestsPath, dscispec.ApplicationsNamespace, ComponentName, enabled); err != nil {
+	if err := deploy.DeployManifestsFromPath(ctx, cli, owner, manifestsPath, dscispec.ApplicationsNamespace, ComponentName, enabled); err != nil {
 		return err
 	}
 	l.Info("apply manifests done")
 
+	// Wait for deployment available
+	if enabled {
+		if err := cluster.WaitForDeploymentAvailable(ctx, cli, ComponentName, dscispec.ApplicationsNamespace, 20, 2); err != nil {
+			return fmt.Errorf("deployment for %s is not ready to server: %w", ComponentName, err)
+		}
+	}
+
 	// CloudService Monitoring handling
 	if platform == cluster.ManagedRhods {
-		if enabled {
-			// first check if the service is up, so prometheus won't fire alerts when it is just startup
-			// only 1 replica should be very quick
-			if err := cluster.WaitForDeploymentAvailable(ctx, cli, ComponentName, dscispec.ApplicationsNamespace, 10, 1); err != nil {
-				return fmt.Errorf("deployment for %s is not ready to server: %w", ComponentName, err)
-			}
-			l.Info("deployment is done, updating monitoring rules")
-		}
-
-		if err := d.UpdatePrometheusConfig(cli, enabled && monitoringEnabled, ComponentName); err != nil {
+		if err := d.UpdatePrometheusConfig(cli, l, enabled && monitoringEnabled, ComponentName); err != nil {
 			return err
 		}
-		if err := deploy.DeployManifestsFromPath(cli, owner,
+		if err := deploy.DeployManifestsFromPath(ctx, cli, owner,
 			filepath.Join(deploy.DefaultManifestPath, "monitoring", "prometheus", "apps"),
 			dscispec.Monitoring.Namespace,
 			"prometheus", true); err != nil {

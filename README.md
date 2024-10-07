@@ -48,8 +48,7 @@ Additionally installing `Authorino operator` & `Service Mesh operator` enhances 
 
   Please note that the latest releases are made in the `Fast` channel.
 
-- It can also be build
-and installed from source manually, see the Developer guide for further instructions.
+- It can also be build and installed from source manually, see the Developer guide for further instructions.
 
   1. Subscribe to operator by creating following subscription
 
@@ -91,11 +90,11 @@ Each component is associated with its manifest location in the `COMPONENT_MANIFE
 #### Workflow
 
 1. The script clones the remote repository `<repo-org>/<repo-name>` from the specified `<branch-name>`.
-2. It then copies the content from the relative path `<source-folder>` to the local `odh-manifests/<target-folder>` folder.
+2. It then copies the content from the relative path `<source-folder>` to the local `opt/manifests/<target-folder>` folder.
 
 #### Local Storage
 
-The script utilizes a local, empty folder named `odh-manifests` to host all required manifests, sourced either directly from the component’s source repository or the default `odh-manifests` git repository.
+The script utilizes a local, empty folder named `opt/manifests` to host all required manifests, sourced directly from each component’s source repository.
 
 #### Adding New Components
 
@@ -123,7 +122,7 @@ If the flag name matches components key defined in `COMPONENT_MANIFESTS` it will
 make get-manifests
 ```
 
-This first cleanup your local `odh-manifests` folder.
+This first cleanup your local `opt/manifests` folder.
 Ensure back up before run this command if you have local changes of manifests want to reuse later.
 
 ##### for build operator image
@@ -135,7 +134,7 @@ make image-build
 By default, building an image without any local changes(as a clean build)
 This is what the production build system is doing.
 
-In order to build an image with local `odh-manifests` folder, to set `IMAGE_BUILD_FLAGS ="--build-arg USE_LOCAL=true"` in make.
+In order to build an image with local `opt/manifests` folder, to set `IMAGE_BUILD_FLAGS ="--build-arg USE_LOCAL=true"` in make.
 e.g `make image-build -e IMAGE_BUILD_FLAGS="--build-arg USE_LOCAL=true"`
 
 #### Build Image
@@ -228,13 +227,20 @@ This will ensure that the doc for the apis are updated accordingly.
 Logger on all controllers can only be changed from CSV with parameters: --log-mode devel
 valid value: "" (as default) || prod || production || devel || development
 
-This mainly impacts logging for pod startup, generating common resource, monitoring deployment.
+This mainly impacts logging for operator pod startup, generating common resource, monitoring deployment.
+
+| --log-mode value | mapping Log level   | Comments       |
+| ---------------- | ------------------- | -------------- |
+| devel            | debug  / 0          | lowest level   |
+| ""               | info / 1            | default option |
+| default          | info / 1            | default option |
+| prod             | error / 2           | highest level  |
 
 #### Component level
 
 Logger on components can be changed by DSCI devFlags during runtime.
 By default, if not set .spec.devFlags.logmode, it uses INFO level
-Modification applies to all components, not only these "Managed" ones
+Modification applies to all components, not only these "Managed" ones.
 Update DSCI CR with .spec.devFlags.logmode, see example :
 
 ```console
@@ -249,7 +255,15 @@ spec:
 ```
 
 Avaiable value for logmode is "devel", "development", "prod", "production".
-The first two work the same set to DEBUG level; the later two work the same, using ERROR level.
+The first two work the same set to DEBUG level; the later two work the same as using ERROR level.
+
+| .spec.devFlags.logmode | stacktrace level | verbosity | Output   | Comments       |
+| ---------------------- | ---------------- | --------- | -------- | -------------- |
+| devel                  | WARN             | INFO      | Console  | lowest level, using epoch time  |
+| development            | WARN             | INFO      | Console  | same as devel  |
+| ""                     | ERROR            | INFO      | JSON     | default option |
+| prod                   | ERROR            | INFO      | JSON     | highest level, using human readable timestamp  |
+| production             | ERROR            | INFO      | JSON     | same as prod   |
 
 ### Example DSCInitialization
 
@@ -311,8 +325,6 @@ spec:
       managementState: Managed
     modelmeshserving:
       managementState: Managed
-    modelregistry:
-      managementState: Managed
     ray:
       managementState: Managed
     trainingoperator:
@@ -336,7 +348,7 @@ spec:
       managementState: Managed
 ```
 
-**Note:** Default value for a component is `false`.
+**Note:** Default value for managementState in component is `false`.
 
 ### Run functional Tests
 

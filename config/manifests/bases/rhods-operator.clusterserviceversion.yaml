@@ -68,10 +68,12 @@ metadata:
             "trainingoperator": {
               "managementState": "Removed"
             },
+            "trustyai": {
+              "managementState": "Removed"
+            }
           }
         }
       }
-    operators.operatorframework.io/internal-objects: '[dscinitialization.opendatahub.io]'
     repository: https://github.com/red-hat-data-services/rhods-operator
   name: rhods-operator.v2.0.0
   namespace: placeholder
@@ -151,10 +153,11 @@ spec:
   - training
   - kserve
   - distributed-workloads
+  - trustyai
   links:
   - name: Red Hat OpenShift AI
     url: https://www.redhat.com/en/technologies/cloud-computing/openshift/openshift-ai
-  minKubeVersion: 1.22.0
+  minKubeVersion: 1.25.0
   provider:
     name: Red Hat
   version: 2.0.0

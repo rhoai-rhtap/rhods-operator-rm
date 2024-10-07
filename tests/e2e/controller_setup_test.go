@@ -21,6 +21,8 @@ import (
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	ctrlruntime "sigs.k8s.io/controller-runtime/pkg/client/config"
+	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	dscv1 "github.com/opendatahub-io/opendatahub-operator/v2/apis/datasciencecluster/v1"
 	dsciv1 "github.com/opendatahub-io/opendatahub-operator/v2/apis/dscinitialization/v1"
@@ -54,6 +56,7 @@ type testContext struct {
 	// time interval to check for resource creation
 	resourceRetryInterval time.Duration
 	// context for accessing resources
+	//nolint:containedctx //reason: legacy v1 test setup
 	ctx context.Context
 }
 
@@ -88,7 +91,7 @@ func NewTestContext() (*testContext, error) {
 		customClient:            custClient,
 		operatorNamespace:       opNamespace,
 		applicationsNamespace:   testDSCI.Spec.ApplicationsNamespace,
-		resourceCreationTimeout: time.Minute * 3, // 5 pods of dashboard will take longer time than ODH
+		resourceCreationTimeout: time.Minute * 7, // since we introduce check for all deployment, we need prolong time here too and match what we set in the component
 		resourceRetryInterval:   time.Second * 10,
 		ctx:                     context.TODO(),
 		testDsc:                 testDSC,
@@ -108,6 +111,8 @@ func TestOdhOperator(t *testing.T) {
 	utilruntime.Must(monitoringv1.AddToScheme(scheme))
 	utilruntime.Must(ofapi.AddToScheme(scheme))
 	utilruntime.Must(operatorv1.AddToScheme(scheme))
+
+	log.SetLogger(zap.New(zap.UseDevMode(true)))
 
 	// individual test suites after the operator is running
 	if !t.Run("validate operator pod is running", testODHOperatorValidation) {

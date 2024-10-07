@@ -714,24 +714,6 @@ rules:
   - patch
   - watch
 - apiGroups:
-  - kfdef.apps.kubeflow.org
-  resources:
-  - kfdefs
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - kubeflow.org
-  resources:
-  - '*'
-  verbs:
-  - '*'
-- apiGroups:
   - machine.openshift.io
   resources:
   - machineautoscalers
@@ -1053,6 +1035,7 @@ rules:
   - consoles
   verbs:
   - delete
+  - get
   - list
   - patch
   - watch

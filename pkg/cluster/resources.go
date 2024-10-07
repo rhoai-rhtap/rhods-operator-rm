@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -12,6 +13,7 @@ import (
 	k8serr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/opendatahub-io/opendatahub-operator/v2/pkg/metadata/labels"
@@ -87,6 +89,10 @@ func CreateSecret(ctx context.Context, cli client.Client, name, namespace string
 // If the configmap already exists, it will be updated with the merged Data and MetaOptions, if any.
 // ConfigMap.ObjectMeta.Name and ConfigMap.ObjectMeta.Namespace are both required, it returns an error otherwise.
 func CreateOrUpdateConfigMap(ctx context.Context, c client.Client, desiredCfgMap *corev1.ConfigMap, metaOptions ...MetaOptions) error {
+	if applyErr := ApplyMetaOptions(desiredCfgMap, metaOptions...); applyErr != nil {
+		return applyErr
+	}
+
 	if desiredCfgMap.GetName() == "" || desiredCfgMap.GetNamespace() == "" {
 		return errors.New("configmap name and namespace must be set")
 	}
@@ -148,6 +154,30 @@ func CreateNamespace(ctx context.Context, cli client.Client, namespace string, m
 	return desiredNamespace, client.IgnoreAlreadyExists(createErr)
 }
 
+// ExecuteOnAllNamespaces executes the passed function for all namespaces in the cluster retrieved in batches.
+func ExecuteOnAllNamespaces(ctx context.Context, cli client.Client, processFunc func(*corev1.Namespace) error) error {
+	namespaces := &corev1.NamespaceList{}
+	paginateListOption := &client.ListOptions{
+		Limit: 500,
+	}
+
+	for { // loop over all paged results
+		if err := cli.List(ctx, namespaces, paginateListOption); err != nil {
+			return err
+		}
+		for i := range namespaces.Items {
+			ns := &namespaces.Items[i]
+			if err := processFunc(ns); err != nil {
+				return err
+			}
+		}
+		if paginateListOption.Continue = namespaces.GetContinue(); namespaces.GetContinue() == "" {
+			break
+		}
+	}
+	return nil
+}
+
 // WaitForDeploymentAvailable to check if component deployment from 'namespace' is ready within 'timeout' before apply prometheus rules for the component.
 func WaitForDeploymentAvailable(ctx context.Context, c client.Client, componentName string, namespace string, interval int, timeout int) error {
 	resourceInterval := time.Duration(interval) * time.Second
@@ -160,7 +190,7 @@ func WaitForDeploymentAvailable(ctx context.Context, c client.Client, componentN
 			return false, fmt.Errorf("error fetching list of deployments: %w", err)
 		}
 
-		fmt.Printf("waiting for %d deployment to be ready for %s\n", len(componentDeploymentList.Items), componentName)
+		ctrl.Log.Info("waiting for " + strconv.Itoa(len(componentDeploymentList.Items)) + " deployment to be ready for " + componentName)
 		for _, deployment := range componentDeploymentList.Items {
 			if deployment.Status.ReadyReplicas != deployment.Status.Replicas {
 				return false, nil
@@ -176,10 +206,34 @@ func CreateWithRetry(ctx context.Context, cli client.Client, obj client.Object, 
 	timeout := time.Duration(timeoutMin) * time.Minute
 
 	return wait.PollUntilContextTimeout(ctx, interval, timeout, true, func(ctx context.Context) (bool, error) {
-		err := cli.Create(ctx, obj)
-		if err != nil {
-			return false, nil //nolint:nilerr
+		// Create can return:
+		// If webhook enabled:
+		//   - no error (err == nil)
+		//   - 500 InternalError likely if webhook is not available (yet)
+		//   - 403 Forbidden if webhook blocks creation (check of existence)
+		//   - some problem (real error)
+		// else, if webhook disabled:
+		//   - no error (err == nil)
+		//   - 409 AlreadyExists if object exists
+		//   - some problem (real error)
+		errCreate := cli.Create(ctx, obj)
+		if errCreate == nil {
+			return true, nil
 		}
-		return true, nil
+
+		// check existence, success case for the function, covers 409 and 403 (or newly created)
+		errGet := cli.Get(ctx, client.ObjectKeyFromObject(obj), obj)
+		if errGet == nil {
+			return true, nil
+		}
+
+		// retry if 500, assume webhook is not available
+		if k8serr.IsInternalError(errCreate) {
+			ctrl.Log.Info("Error creating object, retrying...", "reason", errCreate)
+			return false, nil
+		}
+
+		// some other error
+		return false, errCreate
 	})
 }

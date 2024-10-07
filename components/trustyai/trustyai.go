@@ -28,19 +28,16 @@ var (
 var _ components.ComponentInterface = (*TrustyAI)(nil)
 
 // TrustyAI struct holds the configuration for the TrustyAI component.
-// ## DEPRECATED ## : Installation of TrustyAI operator is deprecated in RHOAI.
-// If TrustyAI operator is installed, it will be removed
-// Changes in managemenstState are not supported.
 // +kubebuilder:object:generate=true
 type TrustyAI struct {
 	components.Component `json:""`
 }
 
-func (t *TrustyAI) OverrideManifests(_ string) error {
+func (t *TrustyAI) OverrideManifests(ctx context.Context, _ cluster.Platform) error {
 	// If devflags are set, update default manifests path
 	if len(t.DevFlags.Manifests) != 0 {
 		manifestConfig := t.DevFlags.Manifests[0]
-		if err := deploy.DownloadManifests(ComponentPathName, manifestConfig); err != nil {
+		if err := deploy.DownloadManifests(ctx, ComponentPathName, manifestConfig); err != nil {
 			return err
 		}
 		// If overlay is defined, update paths
@@ -71,34 +68,35 @@ func (t *TrustyAI) ReconcileComponent(ctx context.Context, cli client.Client, lo
 	if enabled {
 		if t.DevFlags != nil {
 			// Download manifests and update paths
-			if err := t.OverrideManifests(string(platform)); err != nil {
+			if err := t.OverrideManifests(ctx, platform); err != nil {
 				return err
 			}
 		}
 		if (dscispec.DevFlags == nil || dscispec.DevFlags.ManifestsUri == "") && (t.DevFlags == nil || len(t.DevFlags.Manifests) == 0) {
-			if err := deploy.ApplyParams(Path, imageParamMap, false); err != nil {
+			if err := deploy.ApplyParams(Path, imageParamMap); err != nil {
 				return fmt.Errorf("failed to update image %s: %w", Path, err)
 			}
 		}
 	}
 	// Deploy TrustyAI Operator
-	if err := deploy.DeployManifestsFromPath(cli, owner, Path, dscispec.ApplicationsNamespace, t.GetComponentName(), enabled); err != nil {
+	if err := deploy.DeployManifestsFromPath(ctx, cli, owner, Path, dscispec.ApplicationsNamespace, t.GetComponentName(), enabled); err != nil {
 		return err
 	}
 	l.Info("apply manifests done")
 
+	// Wait for deployment available
+	if enabled {
+		if err := cluster.WaitForDeploymentAvailable(ctx, cli, ComponentName, dscispec.ApplicationsNamespace, 10, 2); err != nil {
+			return fmt.Errorf("deployment for %s is not ready to server: %w", ComponentName, err)
+		}
+	}
+
 	// CloudService Monitoring handling
 	if platform == cluster.ManagedRhods {
-		if enabled {
-			if err := cluster.WaitForDeploymentAvailable(ctx, cli, ComponentName, dscispec.ApplicationsNamespace, 10, 1); err != nil {
-				return fmt.Errorf("deployment for %s is not ready to server: %w", ComponentName, err)
-			}
-			l.Info("deployment is done, updating monitoring rules")
-		}
-		if err := t.UpdatePrometheusConfig(cli, enabled && monitoringEnabled, ComponentName); err != nil {
+		if err := t.UpdatePrometheusConfig(cli, l, enabled && monitoringEnabled, ComponentName); err != nil {
 			return err
 		}
-		if err := deploy.DeployManifestsFromPath(cli, owner,
+		if err := deploy.DeployManifestsFromPath(ctx, cli, owner,
 			filepath.Join(deploy.DefaultManifestPath, "monitoring", "prometheus", "apps"),
 			dscispec.Monitoring.Namespace,
 			"prometheus", true); err != nil {

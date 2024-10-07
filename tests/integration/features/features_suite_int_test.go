@@ -1,8 +1,6 @@
 package features_test
 
 import (
-	"context"
-	"fmt"
 	"path/filepath"
 	"testing"
 
@@ -28,8 +26,6 @@ var (
 	envTestClient    client.Client
 	envTestClientset *kubernetes.Clientset
 	envTest          *envtest.Environment
-	ctx              context.Context
-	cancel           context.CancelFunc
 )
 
 var testScheme = runtime.NewScheme()
@@ -40,16 +36,14 @@ func TestFeaturesIntegration(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-
-	ctx, cancel = context.WithCancel(context.TODO())
-
 	opts := zap.Options{Development: true}
 	logf.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseFlagOptions(&opts)))
 
 	By("Bootstrapping k8s test environment")
 	projectDir, err := envtestutil.FindProjectRoot()
 	if err != nil {
-		fmt.Printf("Error finding project root: %v\n", err)
+		logf.Log.Error(err, "Error finding project root")
+
 		return
 	}
 
@@ -89,6 +83,5 @@ var _ = BeforeSuite(func() {
 
 var _ = AfterSuite(func() {
 	By("Tearing down the test environment")
-	cancel()
 	Expect(envTest.Stop()).To(Succeed())
 })
