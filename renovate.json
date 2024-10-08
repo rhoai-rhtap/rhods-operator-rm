@@ -24,7 +24,7 @@
     },
     {
       "enabled": true,
-      "automerge": false,
+      "automerge": true,
       "baseBranches": ["rhoai-2.13"],
       "matchFileNames": ["*Dockerfile*", ".tekton/*.yaml"]
     }
