@@ -6,7 +6,7 @@
   "branchPrefix": "renovate/",
   "packageRules": [
     {
-      "enabled": true,
+      "enabled": false,
       "automerge": true,
       "baseBranches": ["rhoai-2.13"],
       "matchManagers": ["tekton", "dockerfile"],
@@ -18,6 +18,7 @@
         "bump",
         "patch"
       ],
+      "matchManagers": ["tekton", "dockerfile"],
       "enabled": false
     }
   ],
