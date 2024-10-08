@@ -10,6 +10,10 @@
       "enabled": false
     },
     {
+      "matchManagers": ["dockerfile"],
+      "enabled": true
+    },
+    {
       "enabled": true,
       "automerge": true,
       "baseBranches": ["rhoai-2.13"],
