@@ -16,7 +16,7 @@
     {
       "enabled": true,
       "automerge": true,
-      "baseBranches": ["main", "rhoai-2.13"],
+      "baseBranches": ["rhoai-2.13"],
       "matchManagers": ["tekton", "dockerfile"],
       "updateTypes": ["digest"]
     }
