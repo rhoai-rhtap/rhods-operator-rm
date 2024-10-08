@@ -1,25 +1,23 @@
 module github.com/opendatahub-io/opendatahub-operator/v2
 
-go 1.22.0
-
-toolchain go1.22.5
+go 1.21
 
 require (
 	github.com/blang/semver/v4 v4.0.0
-	github.com/go-logr/logr v1.4.2
+	github.com/go-logr/logr v1.4.1
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/onsi/ginkgo/v2 v2.14.0
 	github.com/onsi/gomega v1.30.0
 	github.com/openshift/addon-operator/apis v0.0.0-20230919043633-820afed15881
 	github.com/openshift/api v0.0.0-20230823114715-5fdd7511b790
 	github.com/openshift/custom-resource-status v1.1.2
-	github.com/operator-framework/api v0.27.0
+	github.com/operator-framework/api v0.18.0
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.77.1
+	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.68.0
 	github.com/spf13/afero v1.10.0
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.26.0
-	golang.org/x/exp v0.0.0-20241004190924-225e2abe05e6
+	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.29.2
 	k8s.io/apiextensions-apiserver v0.29.2
@@ -78,13 +76,13 @@ require (
 	github.com/xlab/treeprint v1.2.0 // indirect
 	go.starlark.net v0.0.0-20200306205701-8dd3e2ee1dd5 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/net v0.30.0 // indirect
+	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/oauth2 v0.17.0 // indirect
-	golang.org/x/sys v0.26.0 // indirect
-	golang.org/x/term v0.25.0 // indirect
-	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/term v0.18.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	golang.org/x/tools v0.26.0 // indirect
+	golang.org/x/tools v0.16.1 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
