@@ -11,6 +11,12 @@
       "baseBranches": ["rhoai-2.13"],
       "matchFileNames": ["*Dockerfile*"],
       "updateTypes": ["digest"]
+    },
+    {
+      "enabled": false,
+      "baseBranches": ["main"],
+      "matchFileNames": ["*Dockerfile*"],
+      "updateTypes": ["digest"]
     }
   ],
  "prHourlyLimit": 0
