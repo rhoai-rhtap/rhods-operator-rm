@@ -5,6 +5,9 @@
   ],
   "branchPrefix": "renovate/",
   "baseBranches": ["rhoai-2.13"],
+  "ignoreTests": true,
+  "automergeType": "pr",
+  "automerge": true,
   "packageRules": [
     {
       "matchPackagePatterns": ["*"],
@@ -24,9 +27,6 @@
     },
     {
       "enabled": true,
-      "ignoreTests": true,
-      "automergeType": "pr",
-      "automerge": true,
       "matchFileNames": ["*Dockerfile*", ".tekton/*.yaml"]
     }
   ],
