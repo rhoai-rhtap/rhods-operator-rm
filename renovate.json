@@ -6,19 +6,19 @@
   "branchPrefix": "renovate/",
   "packageRules": [
     {
+      "enabled": true,
+      "automerge": true,
+      "baseBranches": ["rhoai-2.13"],
+      "matchManagers": ["tekton", "dockerfile"],
+      "updateTypes": ["digest"]
+    },
+    {
       "matchUpdateTypes": [
         "major",
         "bump",
         "patch"
       ],
       "enabled": false
-    },
-    {
-      "enabled": true,
-      "automerge": true,
-      "baseBranches": ["rhoai-2.13"],
-      "matchManagers": ["tekton", "dockerfile"],
-      "updateTypes": ["digest"]
     }
   ],
  "prHourlyLimit": 0
