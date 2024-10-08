@@ -8,15 +8,8 @@
   "ignoreTests": true,
   "automergeType": "pr",
   "automerge": true,
+  "enabledManagers": ["dockerfile", "tekton"],
   "packageRules": [
-    {
-      "matchPackagePatterns": ["*"],
-      "enabled": false
-    },
-    {
-      "matchManagers": ["dockerfile", "tekton"],
-      "enabled": true
-    },
     {
       "matchUpdateTypes": ["*"],
       "enabled": false
@@ -26,7 +19,7 @@
       "enabled": true
     },
     {
-      "matchFileNames": ["*Dockerfile*", ".tekton/*.yaml"],
+      "matchFileNames": ["*Dockerfile*", "^\\.tekton/.*\\.yaml$"],
       "enabled": true
     }
   ],
