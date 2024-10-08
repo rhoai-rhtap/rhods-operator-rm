@@ -3,5 +3,23 @@
   "extends": [
     "config:recommended"
   ],
-  "prHourlyLimit": 0
+  "branchPrefix": "renovate/",
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "major",
+        "bump",
+        "patch"
+      ],
+      "enabled": false
+    },
+    {
+      "enabled": true,
+      "automerge": true,
+      "baseBranches": ["main", "rhoai-2.13"],
+      "matchManagers": ["tekton", "dockerfile"],
+      "updateTypes": ["digest"]
+    }
+  ],
+ "prHourlyLimit": 0
 }
