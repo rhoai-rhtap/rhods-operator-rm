@@ -14,17 +14,23 @@
       "enabled": true
     },
     {
+      "matchUpdateTypes": ["*"],
+      "enabled": false
+    },
+    {
+      "matchUpdateTypes": ["digest"],
+      "enabled": true
+    },
+    {
       "enabled": true,
       "automerge": true,
       "baseBranches": ["rhoai-2.13"],
-      "matchFileNames": ["*Dockerfile*"],
-      "updateTypes": ["digest"]
+      "matchFileNames": ["*Dockerfile*"]
     },
     {
       "enabled": false,
       "baseBranches": ["main"],
-      "matchFileNames": ["*Dockerfile*"],
-      "updateTypes": ["digest"]
+      "matchFileNames": ["*Dockerfile*"]
     }
   ],
  "prHourlyLimit": 0
