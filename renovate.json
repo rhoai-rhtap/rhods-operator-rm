@@ -19,7 +19,7 @@
       "enabled": true
     },
     {
-      "matchFileNames": ["*Dockerfile*", "^\\.tekton/.*\\.yaml$"],
+      "matchFileNames": ["*Dockerfile*", ".tekton/**"],
       "enabled": true
     }
   ],
