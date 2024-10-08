@@ -11,7 +11,7 @@
       "enabled": false
     },
     {
-      "matchManagers": ["dockerfile", "tekton"],
+      "matchManagers": ["dockerfile"],
       "enabled": true
     },
     {
@@ -26,7 +26,7 @@
       "enabled": true,
       "automerge": true,
       "baseBranches": ["rhoai-2.13"],
-      "matchFileNames": ["*Dockerfile*", ".tekton/*.yaml"]
+      "matchFileNames": ["*Dockerfile*"]
     }
   ],
  "prHourlyLimit": 0
