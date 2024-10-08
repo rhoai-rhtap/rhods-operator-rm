@@ -6,6 +6,10 @@
   "branchPrefix": "renovate/",
   "packageRules": [
     {
+      "matchPackagePatterns": ["*"],
+      "enabled": false
+    },
+    {
       "enabled": true,
       "automerge": true,
       "baseBranches": ["rhoai-2.13"],
