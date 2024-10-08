@@ -24,6 +24,8 @@
     },
     {
       "enabled": true,
+      "ignoreTests": true,
+      "automergeType": "pr",
       "automerge": true,
       "matchFileNames": ["*Dockerfile*", ".tekton/*.yaml"]
     }
