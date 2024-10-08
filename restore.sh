@@ -2,7 +2,7 @@
 
 for i in $(gh pr list | awk '{print $1}');
 do
-    gh pr -t old
+    gh pr edit -t old
 done
 
 
