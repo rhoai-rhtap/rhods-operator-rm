@@ -4,13 +4,14 @@
     "config:recommended"
   ],
   "branchPrefix": "renovate/",
+  "baseBranches": ["rhoai-2.13"],
   "packageRules": [
     {
       "matchPackagePatterns": ["*"],
       "enabled": false
     },
     {
-      "matchManagers": ["dockerfile"],
+      "matchManagers": ["dockerfile", "tekton"],
       "enabled": true
     },
     {
@@ -23,13 +24,8 @@
     },
     {
       "enabled": true,
-      "automerge": true,
+      "automerge": false,
       "baseBranches": ["rhoai-2.13"],
-      "matchFileNames": ["*Dockerfile*"]
-    },
-    {
-      "enabled": false,
-      "baseBranches": ["main"],
       "matchFileNames": ["*Dockerfile*"]
     }
   ],
