@@ -1,4 +1,4 @@
-name: Operator Processor
+name: Trigger Nightly Operator Build
 
 on:
   workflow_dispatch:
