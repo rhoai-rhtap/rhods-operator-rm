@@ -8,7 +8,7 @@
   "ignoreTests": true,
   "automergeType": "pr",
   "automerge": true,
-  "enabledManagers": ["dockerfile", "tekton", "rpm"],
+  "enabledManagers": ["dockerfile", "tekton"],
   "dockerfile": {
     "enabled": true,
     "additionalBranchPrefix": "{{baseBranch}}/",
