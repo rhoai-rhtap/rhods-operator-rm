@@ -4,22 +4,29 @@
     "config:recommended"
   ],
   "branchPrefix": "renovate/",
-  "baseBranches": ["main"],
   "ignoreTests": true,
   "automergeType": "pr",
   "automerge": true,
-  "enabledManagers": ["dockerfile", "tekton", "rpm"],
+  "enabledManagers": ["dockerfile", "tekton"],
   "dockerfile": {
+    "fileMatch": [
+      "\\.Dockerfile\\.konflux$",
+      "^Dockerfile\\.konflux"
+    ],
+    "branchPrefix": "renovate/",
+    "ignoreTests": true,
+    "automergeType": "pr",
+    "automerge": true,
+    "baseBranches": ["main"],
     "enabled": true,
     "additionalBranchPrefix": "{{baseBranch}}/",
-    "branchPrefix": "konflux/mintmaker/",
     "packageRules": [
       {
         "matchUpdateTypes": ["*"],
         "enabled": false
       },
       {
-        "matchFileNames": ["*.*"],
+        "matchBaseBranches": ["*"],
         "enabled": false
       },
       {
@@ -27,7 +34,7 @@
         "enabled": true
       },
       {
-        "matchFileNames": ["\\.Dockerfile\\.konflux$", "^Dockerfile\\.konflux"],
+        "matchBaseBranches": ["main"],
         "enabled": true
       }
     ]
@@ -40,7 +47,20 @@
     "includePaths": [
       ".tekton/**"
     ],
+    "branchPrefix": "renovate/",
+    "ignoreTests": true,
+    "automergeType": "pr",
+    "automerge": true,
+    "baseBranches": ["rhoai-2.13"],
     "packageRules": [
+      {
+        "matchBaseBranches": ["*"],
+        "enabled": false
+      },
+      {
+        "matchBaseBranches": ["rhoai-2.13"],
+        "enabled": true
+      },
       {
         "matchPackagePatterns": [
           "^quay.io/redhat-appstudio-tekton-catalog/",
