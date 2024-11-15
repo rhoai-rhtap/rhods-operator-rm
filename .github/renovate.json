@@ -7,13 +7,12 @@
   "ignoreTests": true,
   "automergeType": "pr",
   "automerge": true,
-  "baseBranches": ["main", "rhoai-2.13"],
   "enabledManagers": ["dockerfile", "tekton"],
   "dockerfile": {
     "enabled": true,
-
     "additionalBranchPrefix": "{{baseBranch}}/",
     "branchPrefix": "konflux/mintmaker/",
+    "baseBranches": ["main"],
     "packageRules": [
       {
         "matchUpdateTypes": ["*"],
@@ -37,6 +36,7 @@
     "includePaths": [
       ".tekton/**"
     ],
+    "baseBranches": ["rhoai-2.13"],
     "packageRules": [
       {
         "matchBaseBranches": ["*"],
