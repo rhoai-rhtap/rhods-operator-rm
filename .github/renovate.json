@@ -4,7 +4,7 @@
     "config:recommended"
   ],
   "branchPrefix": "renovate/",
-  "baseBranches": ["main"],  // Default base branch
+  "baseBranches": ["main"],
   "ignoreTests": true,
   "automergeType": "pr",
   "automerge": true,
@@ -29,7 +29,7 @@
     ]
   },
   "tekton": {
-    "baseBranches": ["rhoai-2.13"],  // Add this line to specify rhoai-2.13 for Tekton updates
+    "baseBranches": ["rhoai-2.13"],
     "fileMatch": [
       "\\.yaml$",
       "\\.yml$"
