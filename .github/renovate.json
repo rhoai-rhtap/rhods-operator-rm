@@ -17,9 +17,9 @@
     "ignoreTests": true,
     "automergeType": "pr",
     "automerge": true,
+    "baseBranches": ["main"],
     "enabled": true,
     "additionalBranchPrefix": "{{baseBranch}}/",
-    "baseBranches": ["main"],
     "packageRules": [
       {
         "matchUpdateTypes": ["*"],
@@ -47,11 +47,19 @@
     "includePaths": [
       ".tekton/**"
     ],
+    "branchPrefix": "renovate/",
+    "ignoreTests": true,
+    "automergeType": "pr",
+    "automerge": true,
     "baseBranches": ["rhoai-2.13"],
     "packageRules": [
       {
         "matchBaseBranches": ["*"],
         "enabled": false
+      },
+      {
+        "matchBaseBranches": ["rhoai-2.13"],
+        "enabled": true
       },
       {
         "matchPackagePatterns": [
