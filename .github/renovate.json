@@ -19,7 +19,6 @@
     "automerge": true,
     "enabled": true,
     "additionalBranchPrefix": "{{baseBranch}}/",
-    "branchPrefix": "konflux/mintmaker/",
     "baseBranches": ["main"],
     "packageRules": [
       {
