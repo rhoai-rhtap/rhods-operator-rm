@@ -11,8 +11,8 @@
   "enabledManagers": ["dockerfile", "tekton"],
   "dockerfile": {
     "fileMatch": [
-      "^*\\.Dockerfile\\.konflux$",
-      "^Dockerfile\\.konflux\\.*$"
+      "\\.Dockerfile\\.konflux$",
+      "^Dockerfile\\.konflux\\."
     ],
     "enabled": true,
     "additionalBranchPrefix": "{{baseBranch}}/",
