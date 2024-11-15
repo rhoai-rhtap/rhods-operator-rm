@@ -4,7 +4,7 @@ ARG USE_LOCAL=false
 ARG OVERWRITE_MANIFESTS=""
 
 ################################################################################
-FROM registry.access.redhat.com/ubi8/go-toolset@sha256:fe1c5eee22c78e1a9806323ee46329a41ac99521c5022c84765c4d698abb4e82 as builder_local_false
+FROM registry.access.redhat.com/ubi8/go-toolset@sha256:fe1c5eee22c78e1a9806323ee46329a41ac99521c5022c84765c4d698abb4e81 as builder_local_false
 ARG OVERWRITE_MANIFESTS
 # Get all manifests from remote git repo to builder_local_false by script
 USER root
@@ -13,7 +13,7 @@ COPY get_all_manifests.sh get_all_manifests.sh
 RUN ./get_all_manifests.sh ${OVERWRITE_MANIFESTS}
 
 ################################################################################
-FROM registry.access.redhat.com/ubi8/go-toolset@sha256:780ab5f3874a6e2b1e04bb3719e614e835af3f8ab150922d6e84c2f9fd2bdb28 as builder_local_true
+FROM registry.access.redhat.com/ubi8/go-toolset@sha256:fe1c5eee22c78e1a9806323ee46329a41ac99521c5022c84765c4d698abb4e81 as builder_local_true
 # Get all manifests from local to builder_local_true
 USER root
 WORKDIR /opt
