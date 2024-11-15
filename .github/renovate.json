@@ -13,6 +13,10 @@
       "\\.Dockerfile\\.konflux$",
       "^Dockerfile\\.konflux"
     ],
+    "branchPrefix": "renovate/",
+    "ignoreTests": true,
+    "automergeType": "pr",
+    "automerge": true,
     "enabled": true,
     "additionalBranchPrefix": "{{baseBranch}}/",
     "branchPrefix": "konflux/mintmaker/",
