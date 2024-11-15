@@ -17,13 +17,11 @@
     "packageRules": [
       {
         "matchUpdateTypes": ["*"],
-        "matchFileNames": ["*"],
-        "matchBaseBranches": ["*"],
         "enabled": false
       },
       {
         "matchUpdateTypes": ["digest"],
-        "matchFileNames": ["*Dockerfile.konflux*"],
+        "matchFileNames": ["^*.Dockerfile.konflux$", "^Dockerfile.konflux.*$"],
         "matchBaseBranches": ["main"],
         "enabled": true
       }
