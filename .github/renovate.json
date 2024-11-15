@@ -7,29 +7,29 @@
   "ignoreTests": true,
   "automergeType": "pr",
   "automerge": true,
+
   "enabledManagers": ["dockerfile", "tekton"],
   "dockerfile": {
     "enabled": true,
-    "baseBranches": ["main"],
+
     "additionalBranchPrefix": "{{baseBranch}}/",
     "branchPrefix": "konflux/mintmaker/",
     "packageRules": [
       {
         "matchUpdateTypes": ["*"],
+        "matchFileNames": ["*"],
+        "matchBaseBranches": ["*"],
         "enabled": false
       },
       {
         "matchUpdateTypes": ["digest"],
-        "enabled": true
-      },
-      {
         "matchFileNames": ["*Dockerfile.konflux*"],
+        "matchBaseBranches": ["main"],
         "enabled": true
       }
     ]
   },
   "tekton": {
-    "baseBranches": ["rhoai-2.13"],
     "fileMatch": [
       "\\.yaml$",
       "\\.yml$"
@@ -39,15 +39,20 @@
     ],
     "packageRules": [
       {
+        "matchBaseBranches": ["*"],
+        "enabled": false
+      },
+      {
         "matchPackagePatterns": [
           "^quay.io/redhat-appstudio-tekton-catalog/",
           "^quay.io/konflux-ci/tekton-catalog/"
         ],
+        "matchBaseBranches": ["rhoai-2.13"],
         "enabled": true,
         "groupName": "Konflux references",
         "branchPrefix": "konflux/references/",
         "group": {
-          "branchTopic": "rhoai-2.13",
+          "branchTopic": "{{{baseBranch}}}",
           "commitMessageTopic": "{{{groupName}}}"
         },
         "commitMessageTopic": "Konflux references",
