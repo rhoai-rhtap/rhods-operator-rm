@@ -4,11 +4,11 @@
     "config:recommended"
   ],
   "branchPrefix": "renovate/",
-  "baseBranches": ["main","rhoai-2.13"],
+  "baseBranches": ["main"],  // Default base branch
   "ignoreTests": true,
   "automergeType": "pr",
   "automerge": true,
-  "enabledManagers": ["dockerfile", "tekton"],
+  "enabledManagers": ["dockerfile", "tekton", "rpm"],
   "dockerfile": {
     "enabled": true,
     "additionalBranchPrefix": "{{baseBranch}}/",
@@ -23,12 +23,13 @@
         "enabled": true
       },
       {
-        "matchFileNames": ["*Dockerfile*"],
+        "matchFileNames": ["*Dockerfile.konflux*"],
         "enabled": true
       }
     ]
   },
   "tekton": {
+    "baseBranches": ["rhoai-2.13"],  // Add this line to specify rhoai-2.13 for Tekton updates
     "fileMatch": [
       "\\.yaml$",
       "\\.yml$"
@@ -46,7 +47,7 @@
         "groupName": "Konflux references",
         "branchPrefix": "konflux/references/",
         "group": {
-          "branchTopic": "{{{baseBranch}}}",
+          "branchTopic": "rhoai-2.13",
           "commitMessageTopic": "{{{groupName}}}"
         },
         "commitMessageTopic": "Konflux references",
@@ -66,5 +67,5 @@
       }
     ]
   },
- "prHourlyLimit": 0
+  "prHourlyLimit": 0
 }
