@@ -7,7 +7,7 @@
   "ignoreTests": true,
   "automergeType": "pr",
   "automerge": true,
-
+  "baseBranches": ["main", "rhoai-2.13"],
   "enabledManagers": ["dockerfile", "tekton"],
   "dockerfile": {
     "enabled": true,
