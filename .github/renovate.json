@@ -3,6 +3,10 @@
   "extends": [
     "config:recommended"
   ],
+  "major": {
+    "description": "Disable major updates",
+    "enabled": false
+  },
   "branchPrefix": "renovate/",
   "baseBranches": ["main"],
   "ignoreTests": true,
