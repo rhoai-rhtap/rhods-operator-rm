@@ -8,11 +8,11 @@
     "enabled": false
   },
   "minor": {
-    "description": "Disable major updates",
+    "description": "Disable minor updates",
     "enabled": false
   },
   "patch": {
-    "description": "Disable major updates",
+    "description": "Disable patch updates",
     "enabled": false
   },
   "branchPrefix": "renovate/",
