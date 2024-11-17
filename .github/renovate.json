@@ -46,14 +46,11 @@
         "enabled": false
       },
       {
-        "matchUpdateTypes": ["digest"],
-        "enabled": true
-      },
-      {
         "matchPackagePatterns": [
           "^quay.io/redhat-appstudio-tekton-catalog/",
           "^quay.io/konflux-ci/tekton-catalog/"
         ],
+        "matchUpdateTypes": ["digest"],
         "enabled": true,
         "groupName": "Konflux references",
         "branchPrefix": "konflux/references/",
