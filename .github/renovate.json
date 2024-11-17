@@ -19,15 +19,11 @@
         "enabled": false
       },
       {
-        "matchFileNames": ["*.*"],
-        "enabled": false
-      },
-      {
         "matchUpdateTypes": ["digest"],
         "enabled": true
       },
       {
-        "matchFileNames": ["\\.Dockerfile\\.konflux$", "^Dockerfile\\.konflux"],
+        "matchFileNames": ["*Dockerfile.konflux*"],
         "enabled": true
       }
     ]
@@ -70,5 +66,5 @@
       }
     ]
   },
-  "prHourlyLimit": 0
+ "prHourlyLimit": 0
 }
