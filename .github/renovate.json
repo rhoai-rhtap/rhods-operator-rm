@@ -7,6 +7,14 @@
     "description": "Disable major updates",
     "enabled": false
   },
+  "minor": {
+    "description": "Disable major updates",
+    "enabled": false
+  },
+  "patch": {
+    "description": "Disable major updates",
+    "enabled": false
+  },
   "branchPrefix": "renovate/",
   "baseBranches": ["main"],
   "ignoreTests": true,
