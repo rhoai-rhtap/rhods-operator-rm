@@ -9,13 +9,6 @@
   "automergeType": "pr",
   "automerge": true,
   "enabledManagers": ["dockerfile", "tekton"],
-  "packageRules": [
-    {
-      "matchUpdateTypes": ["major", "minor", "pin", "pinDigest", "patch", "bump"],
-      "enabled": false
-    }
-    ],
-
   "dockerfile": {
     "enabled": true,
     "additionalBranchPrefix": "{{baseBranch}}/",
