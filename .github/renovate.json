@@ -3,22 +3,26 @@
   "extends": [
     "config:recommended"
   ],
-  "packageRules": [
-    {
-      "matchUpdateTypes": ["major", "minor", "pin", "pinDigest", "patch", "bump"],
-      "enabled": false
-    }
-    ],
   "branchPrefix": "renovate/",
   "baseBranches": ["main"],
   "ignoreTests": true,
   "automergeType": "pr",
   "automerge": true,
   "enabledManagers": ["dockerfile", "tekton"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["major", "minor", "pin", "pinDigest", "patch", "bump"],
+      "enabled": false
+    }
+    ],
+
   "dockerfile": {
     "enabled": true,
     "additionalBranchPrefix": "{{baseBranch}}/",
     "branchPrefix": "konflux/mintmaker/",
+    "ignoreTests": true,
+    "automergeType": "pr",
+    "automerge": true,
     "packageRules": [
       {
         "matchUpdateTypes": ["major", "minor", "pin", "pinDigest", "patch", "bump"],
