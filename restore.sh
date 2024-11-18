@@ -8,6 +8,7 @@
 #
 #
 #cp -r /home/dchouras/RHODS/DevOps/FBC/operator-back/* .
+git pull --no-edit
 git add .
 git status
 git commit -m "trying renovate"
