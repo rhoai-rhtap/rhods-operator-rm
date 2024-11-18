@@ -16,7 +16,7 @@
     "enabled": false
   },
   "branchPrefix": "renovate/",
-  "baseBranches": ["main", "rhoai-2.16"],
+  "baseBranches": ["main"],
   "ignoreTests": true,
   "automergeType": "pr",
   "automerge": true,
