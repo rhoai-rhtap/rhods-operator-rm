@@ -3,18 +3,12 @@
   "extends": [
     "config:recommended"
   ],
-  "major": {
-    "description": "Disable major updates",
-    "enabled": false
-  },
-  "minor": {
-    "description": "Disable minor updates",
-    "enabled": false
-  },
-  "patch": {
-    "description": "Disable patch updates",
-    "enabled": false
-  },
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["major", "minor", "pin", "pinDigest", "patch", "bump"],
+      "enabled": false
+    }
+    ],
   "branchPrefix": "renovate/",
   "baseBranches": ["main"],
   "ignoreTests": true,
@@ -27,7 +21,7 @@
     "branchPrefix": "konflux/mintmaker/",
     "packageRules": [
       {
-        "matchUpdateTypes": ["*"],
+        "matchUpdateTypes": ["major", "minor", "pin", "pinDigest", "patch", "bump"],
         "enabled": false
       },
       {
@@ -50,7 +44,7 @@
     ],
     "packageRules": [
       {
-        "matchUpdateTypes": ["*"],
+        "matchUpdateTypes": ["major", "minor", "pin", "pinDigest", "patch", "bump"],
         "enabled": false
       },
       {
