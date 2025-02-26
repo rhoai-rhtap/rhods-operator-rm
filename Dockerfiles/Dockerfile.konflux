@@ -13,7 +13,7 @@ COPY get_all_manifests.sh get_all_manifests.sh
 RUN ./get_all_manifests.sh ${OVERWRITE_MANIFESTS}
 
 ################################################################################
-FROM registry.access.redhat.com/ubi8/go-toolset@sha256:64917b531ab4f2996c340aeb74e1f3551221cc779ceb3c6cfcefef0463914777 as builder_local_true
+FROM registry.access.redhat.com/ubi8/go-toolset@sha256:3cc2c32b5fd9a060e4705c04032af69cf27228c6f0f3be18189485641ef0e240 as builder_local_true
 # Get all manifests from local to builder_local_true
 USER root
 WORKDIR /opt
